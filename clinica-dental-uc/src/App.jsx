@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Phone, MapPin, Menu, X, ArrowRight, MessageCircle, Star, Shield, Activity, Sparkles, AlertCircle, Calendar, Clock, User, ChevronLeft, ChevronRight, Check } from 'lucide-react';
-import logoUC from './assets/universidad-cuauhtemoc-seeklogo.png';
-import profilePic from './assets/Regina.jpeg';
-import diagnostic from './assets/Diagnostico.png'
-import coronasyPuentes from './assets/CoronasYPuentes.jpeg';
-import resinasYAmalgamas from './assets/ResinasYAmalgamas.jpeg';
-import incrustaciones from './assets/Incrustaciones.png'
+import logoUC from '@/assets/universidad-cuauhtemoc-seeklogo.png';
+import profilePic from '@/assets/Regina.jpeg';
+import diagnostic from '@/assets/Diagnostico.png'
+import coronasyPuentes from '@/assets/CoronasYPuentes.jpeg';
+import resinasYAmalgamas from '@/assets/ResinasYAmalgamas.jpeg';
+import incrustaciones from '@/assets/Incrustaciones.png'
 
 // --- DATA MODEL ---
 const SERVICES_DATA = [
