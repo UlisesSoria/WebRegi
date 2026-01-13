@@ -3,8 +3,8 @@ import { Phone, MapPin, Menu, X, ArrowRight, MessageCircle, Star, Shield, Activi
 import logoUC from '@/assets/universidad-cuauhtemoc-seeklogo.png';
 import profilePic from '@/assets/Regina.jpeg';
 import diagnostic from '@/assets/Diagnostico.png'
-import coronasyPuentes from '@/assets/CoronasYPuentes.jpeg';
-import resinasYAmalgamas from '@/assets/ResinasYAmalgamas.jpeg';
+import coronasyPuentes from '@/assets/CoronasyPuentes.jpeg';
+import resinasYAmalgamas from '@/assets/ResinasyAmalgamas.jpeg';
 import incrustaciones from '@/assets/Incrustaciones.png'
 
 // --- DATA MODEL ---
