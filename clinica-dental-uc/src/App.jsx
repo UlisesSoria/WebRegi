@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, MapPin, Menu, X, ArrowRight, MessageCircle, Star, Shield, Activity, Sparkles, AlertCircle, Calendar, Clock, User, ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { Phone, MapPin, Menu, X, MessageCircle, Star, Shield, Activity, Sparkles, AlertCircle, Calendar, User } from 'lucide-react';
 import logoUC from '@/assets/universidad-cuauhtemoc-seeklogo.png';
 import profilePic from '@/assets/Regina.jpeg';
 import diagnostic from '@/assets/Diagnostico.png'
@@ -66,66 +66,17 @@ const CONTACT_INFO = {
   institution: 'Universidad Cuauhtémoc'
 };
 
-// --- APPOINTMENT CONFIGURATION ---
-// EDITAR AQUÍ PARA BLOQUEAR HORARIOS
-// Formato: 'YYYY-MM-DD': ['HH:MM', 'HH:MM']
-const BLOCKED_SLOTS = {
-  '2026-01-13': ['10:00', '16:00'],
-};
-
-const WORKING_HOURS = {
-  start: 9, // 9 AM
-  end: 18,  // 6 PM
-  interval: 60 // minutes
-};
-
-
 // --- COMPONENTS ---
 
 const AppointmentModal = ({ isOpen, onClose }) => {
-  const [step, setStep] = useState(1);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedTime, setSelectedTime] = useState(null);
   const [formData, setFormData] = useState({ name: '', phone: '', comments: '' });
 
   if (!isOpen) return null;
 
-  const generateTimeSlots = () => {
-    const slots = [];
-    for (let hour = WORKING_HOURS.start; hour < WORKING_HOURS.end; hour++) {
-      const time = `${hour.toString().padStart(2, '0')}:00`;
-      slots.push(time);
-    }
-    return slots;
-  };
-
-  const handleDateChange = (days) => {
-    const newDate = new Date(selectedDate);
-    newDate.setDate(selectedDate.getDate() + days);
-    // Prevent going to past (allow today)
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (newDate >= today) {
-      setSelectedDate(newDate);
-      setSelectedTime(null); // Reset time when date changes
-    }
-  };
-
-  const formatDate = (date) => {
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return date.toLocaleDateString('es-ES', options);
-  };
-
-  const dateKey = selectedDate.toISOString().split('T')[0];
-  const blockedTimes = BLOCKED_SLOTS[dateKey] || [];
-
   const handleWhatsAppRedirect = (e) => {
     e.preventDefault();
-    const dateStr = formatDate(selectedDate);
     const message = encodeURIComponent(
       `Hola Regina, me gustaría solicitar una cita.\n\n` +
-      `📅 Fecha: ${dateStr}\n` +
-      `⏰ Hora: ${selectedTime}\n\n` +
       `👤 Mis Datos:\n` +
       `Nombre: ${formData.name}\n` +
       `Teléfono: ${formData.phone}\n` +
@@ -141,8 +92,8 @@ const AppointmentModal = ({ isOpen, onClose }) => {
         {/* Header */}
         <div className="bg-[#2D78BC] p-6 text-white flex justify-between items-start">
           <div>
-            <h3 className="text-xl font-bold">Agendar Cita</h3>
-            <p className="text-blue-100 text-sm opacity-80">Selecciona tu horario ideal</p>
+            <h3 className="text-xl font-bold">Solicitar Cita</h3>
+            <p className="text-blue-100 text-sm opacity-80">Cuéntanos qué tratamiento necesitas</p>
           </div>
           <button onClick={onClose} className="p-1 hover:bg-white/20 rounded-full transition-colors">
             <X className="w-5 h-5" />
@@ -151,129 +102,54 @@ const AppointmentModal = ({ isOpen, onClose }) => {
 
         {/* Body */}
         <div className="p-6">
-          {step === 1 ? (
-            <div className="space-y-6">
-              {/* Date Selector */}
-              <div className="flex items-center justify-between bg-gray-50 p-3 rounded-2xl">
-                <button onClick={() => handleDateChange(-1)} className="p-2 hover:bg-gray-200 rounded-xl text-[#2D78BC] transition-colors">
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <div className="text-center">
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider block">Fecha</span>
-                  <span className="text-sm font-bold text-gray-900 capitalize">{formatDate(selectedDate)}</span>
-                </div>
-                <button onClick={() => handleDateChange(1)} className="p-2 hover:bg-gray-200 rounded-xl text-[#2D78BC] transition-colors">
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Time Slots */}
+          <form onSubmit={handleWhatsAppRedirect} className="space-y-4">
+            <div className="space-y-3">
               <div>
-                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-3">Horarios Disponibles</span>
-                <div className="grid grid-cols-3 gap-3">
-                  {generateTimeSlots().map((time) => {
-                    const isBlocked = blockedTimes.includes(time);
-                    const isSelected = selectedTime === time;
-                    return (
-                      <button
-                        key={time}
-                        disabled={isBlocked}
-                        onClick={() => setSelectedTime(time)}
-                        className={`
-                                                    py-2 px-3 rounded-xl text-sm font-bold transition-all border-2
-                                                    ${isBlocked
-                            ? 'bg-gray-100 text-gray-400 border-transparent cursor-not-allowed decoration-slice'
-                            : isSelected
-                              ? 'bg-[#2D78BC] text-white border-[#2D78BC] shadow-lg scale-105'
-                              : 'bg-white text-gray-600 border-gray-100 hover:border-[#2D78BC] hover:text-[#2D78BC]'
-                          }
-                                                `}
-                      >
-                        {time}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <button
-                disabled={!selectedTime}
-                onClick={() => setStep(2)}
-                className="w-full bg-[#2D78BC] text-white py-4 rounded-xl font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#1a5c96] transition-all flex items-center justify-center gap-2"
-              >
-                Continuar <ArrowRight className="w-5 h-5" />
-              </button>
-            </div>
-          ) : (
-            <form onSubmit={handleWhatsAppRedirect} className="space-y-4">
-              <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 mb-6">
-                <div className="flex items-center gap-3 text-[#2D78BC] mb-1">
-                  <Calendar className="w-4 h-4" />
-                  <span className="text-sm font-bold capitalize">{formatDate(selectedDate)}</span>
-                </div>
-                <div className="flex items-center gap-3 text-[#2D78BC]">
-                  <Clock className="w-4 h-4" />
-                  <span className="text-sm font-bold">{selectedTime} hrs</span>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <div>
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1 mb-1 block">Tu Nombre</label>
-                  <div className="relative">
-                    <User className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
-                    <input
-                      required
-                      type="text"
-                      placeholder="Juan Pérez"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl font-medium focus:ring-2 focus:ring-[#2D78BC]/20 transition-all outline-none"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1 mb-1 block">Teléfono</label>
-                  <div className="relative">
-                    <Phone className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
-                    <input
-                      required
-                      type="tel"
-                      placeholder="442 123 4567"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl font-medium focus:ring-2 focus:ring-[#2D78BC]/20 transition-all outline-none"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1 mb-1 block">Tratamiento solicitado</label>
-                  <textarea
-                    placeholder="Resina, amalgama, coronas, puentes, etc."
-                    value={formData.comments}
-                    onChange={(e) => setFormData({ ...formData, comments: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl font-medium focus:ring-2 focus:ring-[#2D78BC]/20 transition-all outline-none h-24 resize-none"
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1 mb-1 block">Tu Nombre</label>
+                <div className="relative">
+                  <User className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+                  <input
+                    required
+                    type="text"
+                    placeholder="Juan Pérez"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl font-medium focus:ring-2 focus:ring-[#2D78BC]/20 transition-all outline-none"
                   />
                 </div>
               </div>
-
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setStep(1)}
-                  className="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-200 transition-all"
-                >
-                  Atrás
-                </button>
-                <button
-                  type="submit"
-                  className="flex-[2] bg-green-500 text-white py-3 rounded-xl font-bold shadow-lg shadow-green-500/30 hover:bg-green-600 transition-all flex items-center justify-center gap-2"
-                >
-                  Solicitar Cita <MessageCircle className="w-5 h-5" />
-                </button>
+              <div>
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1 mb-1 block">Teléfono</label>
+                <div className="relative">
+                  <Phone className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+                  <input
+                    required
+                    type="tel"
+                    placeholder="442 123 4567"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl font-medium focus:ring-2 focus:ring-[#2D78BC]/20 transition-all outline-none"
+                  />
+                </div>
               </div>
-            </form>
-          )}
+              <div>
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1 mb-1 block">Tratamiento solicitado</label>
+                <textarea
+                  placeholder="Resina, amalgama, coronas, puentes, etc."
+                  value={formData.comments}
+                  onChange={(e) => setFormData({ ...formData, comments: e.target.value })}
+                  className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl font-medium focus:ring-2 focus:ring-[#2D78BC]/20 transition-all outline-none h-24 resize-none"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-green-500 text-white py-3 rounded-xl font-bold shadow-lg shadow-green-500/30 hover:bg-green-600 transition-all flex items-center justify-center gap-2"
+            >
+              Enviar por WhatsApp <MessageCircle className="w-5 h-5" />
+            </button>
+          </form>
         </div>
       </div>
     </div>
